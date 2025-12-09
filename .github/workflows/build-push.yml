@@ -13,6 +13,8 @@ jobs:
   semantic-version:
     name: Determine Semantic Version
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       version: ${{ steps.version.outputs.version }}
       new_release: ${{ steps.version.outputs.new_release }}

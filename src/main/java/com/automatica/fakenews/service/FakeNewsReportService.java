@@ -21,7 +21,7 @@ public class FakeNewsReportService {
     }
 
     public List<FakeNewsReport> getPendingReports() {
-        return reportRepository.findByApprovedFalseOrderByReportedAtDesc();
+        return reportRepository.findByApprovedFalseAndRejectedAtIsNullOrderByReportedAtDesc();
     }
 
     public List<FakeNewsReport> getAllReports() {
@@ -45,8 +45,31 @@ public class FakeNewsReportService {
             report.setApproved(true);
             report.setApprovedAt(LocalDateTime.now());
             report.setApprovedBy(approvedBy);
+            // Clear rejection fields if previously rejected
+            report.setRejectedAt(null);
+            report.setRejectedBy(null);
             reportRepository.save(report);
         }
+    }
+
+    @Transactional
+    public void rejectReport(Long id, String rejectedBy) {
+        Optional<FakeNewsReport> reportOpt = reportRepository.findById(id);
+        if (reportOpt.isPresent()) {
+            FakeNewsReport report = reportOpt.get();
+            report.setApproved(false);
+            report.setRejectedAt(LocalDateTime.now());
+            report.setRejectedBy(rejectedBy);
+            reportRepository.save(report);
+        }
+    }
+
+    public List<FakeNewsReport> getRejectedReports() {
+        return reportRepository.findByRejectedAtIsNotNullOrderByRejectedAtDesc();
+    }
+
+    public List<FakeNewsReport> getPublicReports() {
+        return reportRepository.findApprovedAndRejectedReportsOrderByProcessedAtDesc();
     }
 
     @Transactional

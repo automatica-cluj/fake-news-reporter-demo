@@ -20,26 +20,28 @@
     </header>
 
     <main class="container">
-        <h2>Verified Fake News Reports</h2>
-        
+        <h2>Verified and Rejected Fake News Reports</h2>
+
         <div th:if="${reports.isEmpty()}" class="no-reports">
-            <p>No verified reports yet.</p>
+            <p>No reports yet.</p>
         </div>
-        
+
         <div class="reports-list" th:if="${!reports.isEmpty()}">
-            <div class="report-card" th:each="report : ${reports}">
+            <div class="report-card" th:each="report : ${reports}"
+                 th:classappend="${report.rejected ? 'rejected-report' : ''}">
                 <div class="report-header">
                     <span class="category-badge" th:text="${report.category}"></span>
-                    <span class="date" th:text="${#temporals.format(report.approvedAt, 'MMM dd, yyyy')}"></span>
+                    <span class="date" th:text="${#temporals.format(report.approved ? report.approvedAt : report.rejectedAt, 'MMM dd, yyyy')}"></span>
                 </div>
                 <h3 th:text="${report.newsSource}"></h3>
                 <p class="url">
-                    <strong>URL:</strong> 
+                    <strong>URL:</strong>
                     <a th:href="${report.url}" target="_blank" rel="noopener noreferrer" th:text="${report.url}"></a>
                 </p>
                 <p class="description" th:text="${report.description}"></p>
                 <div class="report-footer">
-                    <span class="verified">✓ Verified by Admin</span>
+                    <span class="verified" th:if="${report.approved}">✓ Verified by Admin</span>
+                    <span class="rejected-badge" th:if="${report.rejected}">✗ Rejected by Admin</span>
                 </div>
             </div>
         </div>

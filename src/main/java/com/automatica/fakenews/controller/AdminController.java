@@ -22,20 +22,32 @@ public class AdminController {
     public String dashboard(Model model) {
         List<FakeNewsReport> pendingReports = reportService.getPendingReports();
         List<FakeNewsReport> approvedReports = reportService.getApprovedReports();
-        
+        List<FakeNewsReport> rejectedReports = reportService.getRejectedReports();
+
         model.addAttribute("pendingReports", pendingReports);
         model.addAttribute("approvedReports", approvedReports);
-        
+        model.addAttribute("rejectedReports", rejectedReports);
+
         return "admin/dashboard";
     }
 
     @PostMapping("/approve/{id}")
-    public String approveReport(@PathVariable Long id, 
+    public String approveReport(@PathVariable Long id,
                                 Authentication authentication,
                                 RedirectAttributes redirectAttributes) {
         String username = authentication.getName();
         reportService.approveReport(id, username);
         redirectAttributes.addFlashAttribute("successMessage", "Report approved successfully!");
+        return "redirect:/admin/dashboard";
+    }
+
+    @PostMapping("/reject/{id}")
+    public String rejectReport(@PathVariable Long id,
+                              Authentication authentication,
+                              RedirectAttributes redirectAttributes) {
+        String username = authentication.getName();
+        reportService.rejectReport(id, username);
+        redirectAttributes.addFlashAttribute("successMessage", "Report rejected successfully!");
         return "redirect:/admin/dashboard";
     }
 

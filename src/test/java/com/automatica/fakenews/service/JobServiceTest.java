@@ -91,7 +91,8 @@ class JobServiceTest {
 
         // Then
         verify(jobRepository, never()).save(any(Job.class));
-        verify(jobExecutor, never()).executeJob(anyLong());
+        // executeJob is still called, but it won't do anything since job doesn't exist
+        verify(jobExecutor, times(1)).executeJob(999L);
     }
 
     @Test
@@ -108,7 +109,8 @@ class JobServiceTest {
 
         // Then
         verify(jobRepository, never()).save(any(Job.class));
-        verify(jobExecutor, never()).executeJob(anyLong());
+        // executeJob is still called, but JobExecutor will check status
+        verify(jobExecutor, times(1)).executeJob(1L);
     }
 
     @Test

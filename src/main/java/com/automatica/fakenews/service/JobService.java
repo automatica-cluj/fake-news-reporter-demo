@@ -52,8 +52,14 @@ public class JobService {
         return jobRepository.findById(id);
     }
 
-    @Transactional
     public void approveJob(Long id, String approvedBy) {
+        approveJobTransaction(id, approvedBy);
+        // Trigger async execution after transaction commits
+        jobExecutor.executeJob(id);
+    }
+
+    @Transactional
+    private void approveJobTransaction(Long id, String approvedBy) {
         Optional<Job> jobOpt = jobRepository.findById(id);
         if (jobOpt.isPresent()) {
             Job job = jobOpt.get();
@@ -62,9 +68,6 @@ public class JobService {
                 job.setApprovedAt(LocalDateTime.now());
                 job.setApprovedBy(approvedBy);
                 jobRepository.save(job);
-                
-                // Trigger async execution
-                jobExecutor.executeJob(job.getId());
             }
         }
     }
